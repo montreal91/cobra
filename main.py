@@ -2,7 +2,6 @@
 
 import sys
 import snake
-import time
 
 from panda3d.core                   import Point2
 
@@ -17,7 +16,7 @@ class World( ShowBase ):
         ShowBase.__init__( self )
 
         self.disableMouse( )
-        self.snake          = snake.Snake( body=[ (-7, 1), (-8, 1), (-9, 1) ] )
+        self.snake          = snake.Snake( body=[ (-7, 1), (-8, 1), (-9, 1) ], dot=(-7, 1) )
         self.snake.gen_dot( )
 
         self.background     = loadObject( "background", scale=9000, depth=200, transparency=False )
@@ -33,18 +32,24 @@ class World( ShowBase ):
         self.accept( "arrow_left",  self.snake.turn, [ NEG_X ] )
         self.accept( "arrow_right", self.snake.turn, [ POS_X ] )
 
-        self.taskMgr.add( self.game_loop, "GameLoop" )
+        self.game_task      = taskMgr.add( self.game_loop, "GameLoop" )
+        self.game_task.last = 0
+        self.period         = 0.15
 
     def game_loop( self, task ):
+        dt = task.time - task.last
         if not self.snake.alive: 
             return task.done
-        else:
-            time.sleep( 0.1 ) # cruft
+        if dt >= self.period:
+            task.last = task.time
             self.snake.move_forward( )
             self.snake.check_state( )
             self.draw_snake( )
             self.update_score( )
             return task.cont
+        else:
+            return task.cont
+
 
     def draw_snake( self ):  
         if self.bricks:
@@ -61,6 +66,5 @@ class World( ShowBase ):
             self.score.removeNode( )
         self.score = genLabelText( "Score: %s" % self.snake.get_score( ), 1 )
 
-
 w   = World( )
-run( )
+w.run( )
