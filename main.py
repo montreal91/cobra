@@ -39,12 +39,14 @@ class World( ShowBase ):
     def game_loop( self, task ):
         dt = task.time - task.last
         if not self.snake.alive: 
+            print len( self.bricks )
             return task.done
         if dt >= self.period:
             task.last = task.time
             self.snake.move_forward( )
             self.snake.check_state( )
             self.draw_snake( )
+            # self.draw_bricks( )
             self.update_score( )
             return task.cont
         else:
@@ -55,11 +57,12 @@ class World( ShowBase ):
         if self.bricks:
             for brick in self.bricks:
                 brick.removeNode( )
-        for y in xrange( - MAX_Y, MAX_Y + 1 ):
-            for x in xrange( - MAX_X, MAX_X + 1 ):
-                if (x, y) in self.snake.body or (x, y) == self.snake.dot:
-                    brick = loadObject("brick", pos=Point2( x, y ) )
-                    self.bricks.append( brick )
+
+        for point in self.snake.body:
+            brick = loadObject( "brick", pos=Point2( point[ X ], point[ Y ] ) )
+            self.bricks.append( brick )
+        dot = loadObject( "brick", pos=Point2( self.snake.dot[ X ], self.snake.dot[ Y ] ) )
+        self.bricks.append( dot )
 
     def update_score ( self ):
         if self.score:
