@@ -10,6 +10,7 @@ from direct.task.Task               import Task
 
 from settings                       import *
 from helpers                        import genLabelText, loadObject
+from collections                    import deque
 
 class World( ShowBase ):
     def __init__ ( self ):
@@ -23,8 +24,10 @@ class World( ShowBase ):
         self.gameboard      = loadObject( "background", scale=39.5, depth=100, transparency=False )
         self.escapeText     = genLabelText( "ESC: Quit", 0 )
         self.score          = genLabelText( "Score: %s" % self.snake.get_score( ), 1 )
-        self.bricks         = [ ]
+        self.bricks         = deque( )
+        self.make_dot( )
 
+        self.draw_snake( )
         self.accept( "escape",      sys.exit )
         self.accept( "enter",       self.restart )
         self.accept( "arrow_up",    self.snake.turn, [ POS_Y ] )
@@ -39,30 +42,42 @@ class World( ShowBase ):
     def game_loop( self, task ):
         dt = task.time - task.last
         if not self.snake.alive: 
-            print len( self.bricks )
             return task.done
         if dt >= self.period:
             task.last = task.time
             self.snake.move_forward( )
             self.snake.check_state( )
-            self.draw_snake( )
-            # self.draw_bricks( )
+            self.update_snake( )
+            self.update_dot( )
             self.update_score( )
             return task.cont
         else:
             return task.cont
 
 
-    def draw_snake( self ):  
-        if self.bricks:
-            for brick in self.bricks:
-                brick.removeNode( )
-
+    def draw_snake( self ):
         for point in self.snake.body:
             brick = loadObject( "brick", pos=Point2( point[ X ], point[ Y ] ) )
             self.bricks.append( brick )
-        dot = loadObject( "brick", pos=Point2( self.snake.dot[ X ], self.snake.dot[ Y ] ) )
-        self.bricks.append( dot )
+
+    def update_snake( self ):
+        try:
+            for i in xrange( len( self.snake.body ) ):
+                point   = self.snake.body[ i ]
+                brick   = self.bricks[ i ]
+                brick.setPos( point[ X ], SPRITE_POS, point[ Y ] )
+        except IndexError:
+            new_head    = self.dot
+            self.make_dot( )
+            self.bricks.appendleft( new_head )
+
+    def make_dot( self ):
+        self.dot = loadObject( "brick", pos=Point2( self.snake.dot[ X ], self.snake.dot[ Y ] ) ) 
+
+    def update_dot( self ):
+        x, y = self.dot.getX( ), self.dot.getZ( )
+        if ( x, y ) != self.snake.dot:
+            self.dot.setPos( self.snake.dot[ X ], SPRITE_POS, self.snake.dot[ Y ] )
 
     def update_score ( self ):
         if self.score:

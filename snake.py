@@ -15,9 +15,9 @@ class Snake( object ):
 
     def check_state( self ):
         head = self.body[0]
-        if self.body.count( head ) > 1: self.alive = False #return False
-        elif head[X] < -MAX_X or head[X] > MAX_X: self.alive = False #return False
-        elif head[Y] < -MAX_Y or head[Y] > MAX_Y: self.alive = False #return False
+        if self.body.count( head ) > 1: self.alive = False 
+        elif head[X] < -MAX_X or head[X] > MAX_X: self.alive = False 
+        elif head[Y] < -MAX_Y or head[Y] > MAX_Y: self.alive = False 
 
     def move_forward( self ):
         head = self.body[0]
