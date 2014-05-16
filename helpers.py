@@ -8,10 +8,14 @@ from panda3d.core               import TextNode
 from direct.gui.OnscreenText    import OnscreenText
 
 def genLabelText( text, i, left=True ):
-    if left:
-        return OnscreenText( text = text, pos = ( -1.3, .95-.05*i ), fg=( 1,1,0,1 ), align = TextNode.ALeft, scale = .05 )
-    else:
-        return OnscreenText( text = text, pos = ( 1.1, .95-.05*i ), fg=( 1,1,0,1 ), align = TextNode.ALeft, scale = .05)
+    label           = OnscreenText( text=text )
+    label["fg"]     = ( 0.148, 0.176, 0.105, 1 )
+    label["align"]  = TextNode.ALeft
+    label["scale"]  = 0.06
+    label["font"]   = loader.loadFont('fonts/FreeMonoBold.ttf')
+    if left:    label["pos"] = ( -1.3, .95-.06*i )
+    else:       label["pos"] = ( 0.95, .95-.06*i )
+    return label
 
 def loadObject( tex=None, pos=Point2(0,0), depth=SPRITE_POS, scale=1, transparency=True ):
     obj = loader.loadModel( "models/plane" )

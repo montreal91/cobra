@@ -22,9 +22,9 @@ class World( ShowBase ):
 
         self.background     = loadObject( "background", scale=9000, depth=200, transparency=False )
         self.gameboard      = loadObject( "background", scale=39.5, depth=100, transparency=False )
-        self.escape_text    = genLabelText( "ESC: Quit", 0 )
-        self.pause_text     = genLabelText( "Space: Pause", 1)
-        self.score          = genLabelText( "Score: %s" % self.snake.get_score( ), 0, left=False )
+        self.escape_text    = genLabelText( "ESC  : Quit", 0 )
+        self.pause_text     = genLabelText( "SPACE: Pause", 1)
+        self.score          = genLabelText( "SCORE: %s" % self.snake.get_score( ), 0, left=False )
         
         self.bricks         = deque( )
         self.make_dot( )
