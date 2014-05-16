@@ -22,8 +22,10 @@ class World( ShowBase ):
 
         self.background     = loadObject( "background", scale=9000, depth=200, transparency=False )
         self.gameboard      = loadObject( "background", scale=39.5, depth=100, transparency=False )
-        self.escapeText     = genLabelText( "ESC: Quit", 0 )
-        self.score          = genLabelText( "Score: %s" % self.snake.get_score( ), 1 )
+        self.escape_text    = genLabelText( "ESC: Quit", 0 )
+        self.pause_text     = genLabelText( "Space: Pause", 1)
+        self.score          = genLabelText( "Score: %s" % self.snake.get_score( ), 0, left=False )
+        
         self.bricks         = deque( )
         self.make_dot( )
 
@@ -34,16 +36,20 @@ class World( ShowBase ):
         self.accept( "arrow_down",  self.snake.turn, [ NEG_Y ] )
         self.accept( "arrow_left",  self.snake.turn, [ NEG_X ] )
         self.accept( "arrow_right", self.snake.turn, [ POS_X ] )
+        self.accept( "space",       self.tooggle_pause )
 
         self.game_task      = taskMgr.add( self.game_loop, "GameLoop" )
         self.game_task.last = 0
         self.period         = 0.15
+        self.pause          = False
 
     def game_loop( self, task ):
         dt = task.time - task.last
         if not self.snake.alive: 
             return task.done
-        if dt >= self.period:
+        if self.pause:
+            return task.cont
+        elif dt >= self.period:
             task.last = task.time
             self.snake.move_forward( )
             self.snake.check_state( )
@@ -79,10 +85,14 @@ class World( ShowBase ):
         if ( x, y ) != self.snake.dot:
             self.dot.setPos( self.snake.dot[ X ], SPRITE_POS, self.snake.dot[ Y ] )
 
-    def update_score ( self ):
+    def update_score( self ):
         if self.score:
             self.score.removeNode( )
-        self.score = genLabelText( "Score: %s" % self.snake.get_score( ), 1 )
+        self.score = genLabelText( "Score: %s" % self.snake.get_score( ), 0, left=False )
+
+    def tooggle_pause( self ):
+        if self.pause:  self.pause = False
+        else:           self.pause = True
 
 w   = World( )
 w.run( )

@@ -7,8 +7,11 @@ from panda3d.core               import TextNode
 
 from direct.gui.OnscreenText    import OnscreenText
 
-def genLabelText( text, i ):
-    return OnscreenText( text = text, pos = ( -1.3, .95-.05*i ), fg=( 1,1,0,1 ), align = TextNode.ALeft, scale = .05 )
+def genLabelText( text, i, left=True ):
+    if left:
+        return OnscreenText( text = text, pos = ( -1.3, .95-.05*i ), fg=( 1,1,0,1 ), align = TextNode.ALeft, scale = .05 )
+    else:
+        return OnscreenText( text = text, pos = ( 1.1, .95-.05*i ), fg=( 1,1,0,1 ), align = TextNode.ALeft, scale = .05)
 
 def loadObject( tex=None, pos=Point2(0,0), depth=SPRITE_POS, scale=1, transparency=True ):
     obj = loader.loadModel( "models/plane" )
