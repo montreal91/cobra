@@ -1,41 +1,52 @@
-# -*- coding: utf-8 -*- 
 
-from settings       import *
-from collections    import deque
-from random         import randrange
 
-class Snake( object ):
-    def __init__( self, body=[(0, 0), (1, 0), (2, 0)], vector=POS_X, dot=(0, 0) ):
-        object.__init__( self )
-        self.body           = deque( body )
-        self.vector         = vector
-        self.dot            = dot
-        self.alive          = True
-        self.init_len       = len( self.body )
+from collections import deque
+from random import randrange
 
-    def check_state( self ):
+from settings import MAX_X
+from settings import MAX_Y
+
+
+class Snake:
+    def __init__(self, body, vector, dot):
+        self.body = deque(body)
+        self.vector = vector
+        self.dot = dot
+        self.alive = True
+        self.init_len = len(self.body)
+        self._previous_step = self.vector
+
+    def check_state(self):
         head = self.body[0]
-        if self.body.count( head ) > 1: self.alive = False 
-        elif head[X] < -MAX_X or head[X] > MAX_X: self.alive = False 
-        elif head[Y] < -MAX_Y or head[Y] > MAX_Y: self.alive = False 
+        if self.body.count(head) > 1:
+            self.alive = False
+        elif not -MAX_X <= head.real <= MAX_X:
+            self.alive = False
+        elif not -MAX_Y <= head.imag <= MAX_Y:
+            self.alive = False
 
-    def move_forward( self ):
+    def move_forward(self):
         head = self.body[0]
-        next = ( head[X] + self.vector[X], head[Y] + self.vector[Y] )
-        self.body.appendleft( next )
+        next_brick = complex(
+            head.real + self.vector.real, head.imag + self.vector.imag
+        )
+        self.body.appendleft(next_brick)
         if head == self.dot:
-            self.gen_dot( )
-        if next != self.dot:
-            self.body.pop( )
+            self.gen_dot()
+        if next_brick != self.dot:
+            self.body.pop()
+        self._previous_step = self.vector
 
-    def turn ( self, direction ):
-        scal_prod   = self.vector[X] * direction[X] + self.vector[Y] * direction[Y]
-        if scal_prod == 0:
+    def turn(self, direction):
+        if self._previous_step + direction != 0:
             self.vector = direction
 
-    def gen_dot( self ):
+    def gen_dot(self):
         while self.dot in self.body:
-            self.dot    = ( randrange( - MAX_X, MAX_X ), randrange( -MAX_Y, MAX_Y ) )
+            self.dot = complex(
+                randrange(- MAX_X, MAX_X),
+                randrange(-MAX_Y, MAX_Y)
+            )
 
-    def get_score( self ):
-        return len( self.body ) - self.init_len
+    def get_score(self):
+        return len(self.body) - self.init_len
