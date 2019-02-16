@@ -9,4 +9,4 @@ NEG_Y = complex(0, -1)
 
 SPRITE_POS = 55
 
-SPEED = 10
+PERIOD = 0.15
